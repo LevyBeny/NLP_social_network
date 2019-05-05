@@ -10,13 +10,15 @@ class DataExtraction():
 
     def get_tweets_by_social_network(self,social_network):
         regex = re.compile(r"href=.*({}|{}).*>".format(social_network, social_network.capitalize()))
+        regex_str = r"href=.*({}|{}).*>".format(social_network, social_network.capitalize())
         reg_entity = re.compile(r'{}|{}'.format(social_network, social_network.capitalize()))
 
-        res_source = list(self.collection.find({"source": regex}))
+        regex_str = r"href=.*({}|{}).*>".format(social_network, social_network.capitalize())
+        res_source = list(self.collection.find({"source": {'$regex':regex_str}}))
         #res_entity =list(self.collection.find({"source":{"urls":{}} regex}))
 
        # res_entity =
-        return reg_entity
+        return res_source
 
 
 client = MongoClient(MONGOHOST)
