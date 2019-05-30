@@ -14,17 +14,10 @@ class MyStreamListener(tweepy.StreamListener):
         print(status.text)
 
 
-    def create_source_string(self,network):
-        reg_source = re.compile(r"href=.*({}|{}).*>".format(network, network.capitalize()))
-        return reg_source
-
-    def create_entity_string(self, network):
-        reg_entity = re.compile(r'{}|{}'.format(network, network.capitalize()))
-        return reg_entity
-
     def filter_tweets_by_network(self, tweet_json,network):
-        reg_source = self.create_source_string(network)
-        reg_entity = self.create_entity_string(network)
+        reg_source = re.compile(r"href=.*(instagram|pinterest|Instagram|Pinterest|facebook|Facebook|tumblr|Tumblr).*>")
+        reg_entity = re.compile(r'instagram|pinterest|Instagram|Pinterest|facebook|Facebook|tumblr|Tumblr')
+
         result = None
         for _json in tweet_json["entities"]["urls"]:
             if result:
@@ -39,17 +32,18 @@ class MyStreamListener(tweepy.StreamListener):
     def on_data(self, raw_data):
         try:
             client = MongoClient(MONGOHOST)
-            db = client.twitterdblinkedin
+            db = client.twitterdbusers
 
             tweet_json = json.loads(raw_data)
 
-           # reg_source = re.compile(r"href=.*(instagram|pinterest|Instagram|Pinterest|facebook|Facebook|tumblr|Tumblr).*>")
-            #reg_entity = re.compile(r'instagram|pinterest|Instagram|Pinterest|facebook|Facebook|tumblr|Tumblr')
-
             result = self.filter_tweets_by_network(tweet_json,"linkedin")
-            if result:
-                print("Tweet Accepted {}".format(tweet_json["source"]))
-                db.social_tweets.insert(tweet_json)
+            if not result:
+                user_id = tweet_json['user']['id']
+
+                for network in social_networks:
+                    if user_id in uniques_dict[network]:
+                        print("Tweet Accepted to {}".format(network))
+                        db[network].insert(tweet_json)
 
         except Exception as e:
             print(e)
@@ -80,8 +74,12 @@ users_list = []
 for network in social_networks:
     with open(unique_path.format(network), mode='rb') as f:
         uniques_dict[network] = pickle.load(f)
-    users_list += list(uniques_dict[network].keys())
+    # if network in ["pinterest","instagram"]:
+    network_list = list(uniques_dict[network].keys())
+    first_1000 = network_list[:1000]
+    users_list += first_1000
+users_list = [str(id) for id in users_list]
+stream.filter(follow=users_list[1000:5000])
 
-stream.filter(follow=users_list)
 
 
