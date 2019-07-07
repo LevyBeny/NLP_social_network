@@ -1,5 +1,6 @@
 import re
 import pickle
+import numpy as np
 from pymongo import MongoClient
 
 
@@ -68,6 +69,26 @@ for tweet in collection.find():
 
 
 print('Num of users with no social network: {}'.format(len(general_users)))
+
+print("################### Instegram ###################")
+print('Num of users : %.d' % (len(instagram_users.keys())))
+print('Avg Num of tweets per user : %.4f' % (np.mean(list(instagram_users.values()))))
+print()
+
+print("################### Facebook ###################")
+print('Num of users : %.4f' % (len(facebook_users.keys())))
+print('Avg Num of tweets per user : %.4f' % (np.mean(list(facebook_users.values()))))
+print()
+
+print("################### Pinterest ###################")
+print('Num of users : %.4f' % (len(pinterest_users.keys())))
+print('Avg Num of tweets per user : %.4f' % (np.mean(list(pinterest_users.values()))))
+print()
+
+print("################### Tumblr ###################")
+print('Num of users : %.4f' % (len(tumblr_users.keys())))
+print('Avg Num of tweets per user : %.4f' % (np.mean(list(tumblr_users.values()))))
+print()
 
 
 # Save the users dicts

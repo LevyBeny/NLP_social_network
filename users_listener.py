@@ -5,6 +5,7 @@ import pickle
 from pymongo import MongoClient
 
 
+
 MONGOHOST = "mongodb://localhost:27017/?serverSelectionTimeoutMS=5000&connectTimeoutMS=10000&3t.uriVersion=3&3t.connection.name=twitterdb"
 social_networks = ["pinterest","facebook","instagram","tumblr"]
 
@@ -14,7 +15,7 @@ class MyStreamListener(tweepy.StreamListener):
         print(status.text)
 
 
-    def filter_tweets_by_network(self, tweet_json,network):
+    def filter_tweets_by_network(self, tweet_json):
         reg_source = re.compile(r"href=.*(instagram|pinterest|Instagram|Pinterest|facebook|Facebook|tumblr|Tumblr).*>")
         reg_entity = re.compile(r'instagram|pinterest|Instagram|Pinterest|facebook|Facebook|tumblr|Tumblr')
 
@@ -36,7 +37,7 @@ class MyStreamListener(tweepy.StreamListener):
 
             tweet_json = json.loads(raw_data)
 
-            result = self.filter_tweets_by_network(tweet_json,"linkedin")
+            result = self.filter_tweets_by_network(tweet_json)
             if not result:
                 user_id = tweet_json['user']['id']
 
